@@ -1,0 +1,13 @@
+[package]
+name = "xirr"
+version = "0.1.0"
+authors = ["Chandra Sekar S"]
+license = "Apache-2.0"
+repository = "https://github.com/cskr/xirr"
+description = "XIRR for Rust"
+
+[dependencies]
+chrono = "0.4.2"
+
+[dev-dependencies]
+csv = "1.0.0"
