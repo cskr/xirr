@@ -1,10 +1,7 @@
-Implementation of the XIRR function found in spreadsheet applications like LibreOffice Calc for Rust.
+[![Crates.io](https://img.shields.io/crates/v/xirr.svg)](https://crates.io/crates/xirr)
 
-Add the following line to Cargo.toml and visit the [documentation](https://docs.rs/xirr) for further details.
-
-```
-xirr = "0.1.0"
-```
+Implementation of the XIRR function found in spreadsheet applications like LibreOffice Calc for Rust. Download from
+[crates.io](https://crates.io/crates/xirr) and visit the [documentation](https://docs.rs/xirr) for further details.
 
 ## License
 
