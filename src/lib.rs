@@ -59,10 +59,10 @@ pub struct Payment {
 ///
 /// This function will return [`InvalidPaymentsError`](struct.InvalidPaymentsError.html)
 /// if both positive and negative payments are not provided.
-pub fn compute(payments: Vec<Payment>) -> Result<f64, InvalidPaymentsError> {
-    validate(&payments)?;
+pub fn compute(payments: &Vec<Payment>) -> Result<f64, InvalidPaymentsError> {
+    validate(payments)?;
 
-    let mut rate = compute_with_guess(&payments, 0.1);
+    let mut rate = compute_with_guess(payments, 0.1);
     let mut guess = -0.99;
     while guess < 1.0 && (rate.is_nan() || rate.is_infinite()) {
         rate = compute_with_guess(&payments, guess);
@@ -88,7 +88,6 @@ impl Error for InvalidPaymentsError {
         "negative and positive payments are required"
     }
 }
-
 
 fn compute_with_guess(payments: &Vec<Payment>, guess: f64) -> f64 {
     let mut r = guess;
