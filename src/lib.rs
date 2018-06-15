@@ -43,6 +43,7 @@ const MAX_ERROR: f64 = 1e-10;
 /// A payment made or received on a particular date.
 ///
 /// `amount` must be negative for payment made and positive for payment received.
+#[derive(Copy, Clone)]
 pub struct Payment {
     pub amount: f64,
     pub date: NaiveDate,
