@@ -21,14 +21,14 @@
 //! ```
 //! use xirr::*;
 //!
-//! let xirr = compute(vec![
-//!      Payment { date: "2015-06-11".parse().unwrap(), amount: -1000.0 },
-//!      Payment { date: "2015-07-21".parse().unwrap(), amount: -9000.0 },
-//!      Payment { date: "2015-10-17".parse().unwrap(), amount: -3000.0 },
-//!      Payment { date: "2018-06-10".parse().unwrap(), amount: 20000.0 }
-//!  ]);
+//! let payments = vec![
+//!     Payment { date: "2015-06-11".parse().unwrap(), amount: -1000.0 },
+//!     Payment { date: "2015-07-21".parse().unwrap(), amount: -9000.0 },
+//!     Payment { date: "2018-06-10".parse().unwrap(), amount: 20000.0 },
+//!     Payment { date: "2015-10-17".parse().unwrap(), amount: -3000.0 },
+//! ];
 //!
-//!  assert_eq!(0.1635371584432641, xirr.unwrap());
+//!  assert_eq!(0.1635371584432641, compute(&payments).unwrap());
 //! ```
 
 extern crate chrono;
