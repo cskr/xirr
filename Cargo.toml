@@ -14,4 +14,4 @@ exclude = ["tests/*"]
 chrono = "0.4.2"
 
 [dev-dependencies]
-csv = "1.0.0"
+csv = "^1.0.0"
