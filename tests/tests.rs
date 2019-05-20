@@ -1,6 +1,3 @@
-extern crate csv;
-extern crate xirr;
-
 use xirr::*;
 
 const MAX_ERROR: f64 = 1e-10;

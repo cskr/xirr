@@ -31,8 +31,6 @@
 //!  assert_eq!(0.1635371584432641, compute(&payments).unwrap());
 //! ```
 
-extern crate chrono;
-
 use chrono::prelude::*;
 use std::error::Error;
 use std::fmt::{Display, Formatter};
