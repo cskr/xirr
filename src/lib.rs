@@ -77,15 +77,11 @@ pub struct InvalidPaymentsError;
 
 impl Display for InvalidPaymentsError {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        self.description().fmt(f)
+        "negative and positive payments are required".fmt(f)
     }
 }
 
-impl Error for InvalidPaymentsError {
-    fn description(&self) -> &str {
-        "negative and positive payments are required"
-    }
-}
+impl Error for InvalidPaymentsError {}
 
 fn compute_with_guess(payments: &Vec<Payment>, guess: f64) -> f64 {
     let mut r = guess;
