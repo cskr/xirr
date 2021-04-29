@@ -31,6 +31,21 @@ fn test_same_sign() {
     assert!(result_positive.is_err());
 }
 
+#[test]
+fn test_max_iter() {
+    let payments = vec![
+        Payment { date: "2020-10-19".parse().unwrap(), amount: -10000.0 },
+        Payment { date: "2020-10-19".parse().unwrap(), amount: 1000.0 },
+        Payment { date: "2020-10-19".parse().unwrap(), amount: 300.0 },
+        Payment { date: "2020-10-19".parse().unwrap(), amount: 4000.0 },
+        Payment { date: "2020-10-19".parse().unwrap(), amount: 450.0 },
+        Payment { date: "2020-10-20".parse().unwrap(), amount: 5000.0 },
+        Payment { date: "2020-10-21".parse().unwrap(), amount: 250.0 }
+    ];
+    let result = compute(&payments).unwrap();
+    assert!(result.is_nan())
+}
+
 fn load_payments(file: &str) -> Vec<Payment> {
     csv::ReaderBuilder::new().has_headers(false)
         .from_path(file).unwrap().records()
