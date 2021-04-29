@@ -33,10 +33,11 @@
 
 use chrono::prelude::*;
 use std::error::Error;
-use std::fmt::{Display, Formatter};
 use std::fmt;
+use std::fmt::{Display, Formatter};
 
 const MAX_ERROR: f64 = 1e-10;
+const MAX_COMPUTE_WITH_GUESS_ITERATIONS: u32 = 50;
 
 /// A payment made or received on a particular date.
 ///
@@ -51,7 +52,7 @@ pub struct Payment {
 ///
 /// It tries to identify the rate of return using Newton's method with an initial guess of 0.1.
 /// If that does not provide a solution, it attempts with guesses from -0.99 to 0.99
-/// in increments of 0.01.
+/// in increments of 0.01 and returns f64:NAN if not succeeded.
 ///
 /// # Errors
 ///
@@ -60,10 +61,14 @@ pub struct Payment {
 pub fn compute(payments: &Vec<Payment>) -> Result<f64, InvalidPaymentsError> {
     validate(payments)?;
 
-    let mut rate = compute_with_guess(payments, 0.1);
+    let mut sorted: Vec<_> = payments.iter().collect();
+    sorted.sort_by_key(|p| p.date);
+
+    let mut rate = compute_with_guess(&sorted, 0.1);
     let mut guess = -0.99;
+
     while guess < 1.0 && (rate.is_nan() || rate.is_infinite()) {
-        rate = compute_with_guess(&payments, guess);
+        rate = compute_with_guess(&sorted, guess);
         guess += 0.01;
     }
 
@@ -83,37 +88,36 @@ impl Display for InvalidPaymentsError {
 
 impl Error for InvalidPaymentsError {}
 
-fn compute_with_guess(payments: &Vec<Payment>, guess: f64) -> f64 {
+fn compute_with_guess(payments: &Vec<&Payment>, guess: f64) -> f64 {
     let mut r = guess;
     let mut e = 1.0;
-    while e > MAX_ERROR {
+
+    for _ in 0..MAX_COMPUTE_WITH_GUESS_ITERATIONS {
+        if e <= MAX_ERROR {
+            return r;
+        }
+
         let r1 = r - xirr(payments, r) / dxirr(payments, r);
         e = (r1 - r).abs();
-        r = r1
+        r = r1;
     }
 
-    r
+    f64::NAN
 }
 
-fn xirr(payments: &Vec<Payment>, rate: f64) -> f64 {
-    let mut sorted: Vec<_> = payments.iter().collect();
-    sorted.sort_by_key(|p| p.date);
-
+fn xirr(payments: &Vec<&Payment>, rate: f64) -> f64 {
     let mut result = 0.0;
-    for p in &sorted {
-        let exp = get_exp(p, sorted[0]);
+    for p in payments {
+        let exp = get_exp(p, payments[0]);
         result += p.amount / (1.0 + rate).powf(exp)
     }
     result
 }
 
-fn dxirr(payments: &Vec<Payment>, rate: f64) -> f64 {
-    let mut sorted: Vec<&Payment> = payments.iter().collect();
-    sorted.sort_by_key(|p| p.date);
-
+fn dxirr(payments: &Vec<&Payment>, rate: f64) -> f64 {
     let mut result = 0.0;
-    for p in &sorted {
-        let exp = get_exp(p, sorted[0]);
+    for p in payments {
+        let exp = get_exp(p, payments[0]);
         result -= p.amount * exp / (1.0 + rate).powf(exp + 1.0)
     }
     result
