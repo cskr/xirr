@@ -52,7 +52,7 @@ pub struct Payment {
 ///
 /// It tries to identify the rate of return using Newton's method with an initial guess of 0.1.
 /// If that does not provide a solution, it attempts with guesses from -0.99 to 0.99
-/// in increments of 0.01 and returns f64:NAN if not succeeded.
+/// in increments of 0.01 and returns NaN if that fails too.
 ///
 /// # Errors
 ///
