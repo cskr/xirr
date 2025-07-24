@@ -1,4 +1,4 @@
-use chrono::NaiveDate;
+use jiff::civil::Date;
 use xirr::*;
 
 const MAX_ERROR: f64 = 1e-10;
@@ -19,7 +19,7 @@ fn test_random() {
 
 #[test]
 fn test_same_sign() {
-    let result_negative = compute::<NaiveDate>(&vec![
+    let result_negative = compute::<Date>(&vec![
         Payment {
             date: "2016-06-11".parse().unwrap(),
             amount: -100.0,
@@ -31,7 +31,7 @@ fn test_same_sign() {
     ]);
     assert!(result_negative.is_err());
 
-    let result_positive = compute::<NaiveDate>(&vec![
+    let result_positive = compute::<Date>(&vec![
         Payment {
             date: "2016-06-11".parse().unwrap(),
             amount: 100.0,
@@ -76,11 +76,11 @@ fn test_max_iter() {
             amount: 250.0,
         },
     ];
-    let result = compute::<NaiveDate>(&payments).unwrap();
+    let result = compute::<Date>(&payments).unwrap();
     assert!(result.is_nan())
 }
 
-fn load_payments(file: &str) -> Vec<Payment<NaiveDate>> {
+fn load_payments(file: &str) -> Vec<Payment<Date>> {
     csv::ReaderBuilder::new()
         .has_headers(false)
         .from_path(file)

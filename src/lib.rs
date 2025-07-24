@@ -19,7 +19,7 @@
 //! # Example
 //!
 //! ```
-//! use chrono::NaiveDate;
+//! use jiff::civil::Date;
 //! use xirr::*;
 //!
 //! let payments = vec![
@@ -29,7 +29,7 @@
 //!     Payment { date: "2015-10-17".parse().unwrap(), amount: -3000.0 },
 //! ];
 //!
-//!  assert_eq!(0.1635371584432641, compute::<NaiveDate>(&payments).unwrap());
+//!  assert_eq!(0.1635371584432641, compute::<Date>(&payments).unwrap());
 //! ```
 
 use std::error::Error;
@@ -38,6 +38,8 @@ use std::fmt::{Display, Formatter};
 
 #[cfg(feature = "chrono")]
 mod chrono;
+#[cfg(feature = "jiff")]
+mod jiff;
 
 const MAX_ERROR: f64 = 1e-10;
 const MAX_COMPUTE_WITH_GUESS_ITERATIONS: u32 = 50;
