@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+
 //! # XIRR
 //!
 //! `xirr` implements the XIRR function found in spreadsheet applications like LibreOffice Calc.
@@ -32,8 +34,8 @@
 //!  assert_eq!(0.1635371584432641, compute::<Date>(&payments).unwrap());
 //! ```
 //!
-//! If you use chrono, replace [`jiff::civil::Date`](::jiff::civil::Date)
-//! with [`chrono::NaiveDate`](::chrono::NaiveDate).
+//! If you use chrono, enable the `chrono` feature and replace
+//! [`jiff::civil::Date`](::jiff::civil::Date) with [`chrono::NaiveDate`](::chrono::NaiveDate).
 
 use std::error::Error;
 use std::fmt;
