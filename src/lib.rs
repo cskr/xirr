@@ -31,6 +31,9 @@
 //!
 //!  assert_eq!(0.1635371584432641, compute::<Date>(&payments).unwrap());
 //! ```
+//!
+//! If you use chrono, replace [`jiff::civil::Date`](::jiff::civil::Date)
+//! with [`chrono::NaiveDate`](::chrono::NaiveDate).
 
 use std::error::Error;
 use std::fmt;
@@ -143,6 +146,11 @@ fn get_exp<T: PaymentDate>(p: &Payment<T>, p0: &Payment<T>) -> f64 {
     p.date.days_since(p0.date) as f64 / 365.0
 }
 
+/// A trait representing the date on which a payment was made.
+///
+/// This trait is implemented for [`jiff::civil::Date`](::jiff::civil::Date)
+/// and [`chrono::NaiveDate`](::chrono::NaiveDate).
 pub trait PaymentDate: Ord + Sized + Copy {
+    /// Calculates the number days from the `other` date to this date.
     fn days_since(self, other: Self) -> i32;
 }
