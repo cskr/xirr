@@ -19,6 +19,7 @@
 //! # Example
 //!
 //! ```
+//! use chrono::NaiveDate;
 //! use xirr::*;
 //!
 //! let payments = vec![
@@ -28,13 +29,15 @@
 //!     Payment { date: "2015-10-17".parse().unwrap(), amount: -3000.0 },
 //! ];
 //!
-//!  assert_eq!(0.1635371584432641, compute(&payments).unwrap());
+//!  assert_eq!(0.1635371584432641, compute::<NaiveDate>(&payments).unwrap());
 //! ```
 
-use chrono::prelude::*;
 use std::error::Error;
 use std::fmt;
 use std::fmt::{Display, Formatter};
+
+#[cfg(feature = "chrono")]
+mod chrono;
 
 const MAX_ERROR: f64 = 1e-10;
 const MAX_COMPUTE_WITH_GUESS_ITERATIONS: u32 = 50;
@@ -43,9 +46,9 @@ const MAX_COMPUTE_WITH_GUESS_ITERATIONS: u32 = 50;
 ///
 /// `amount` must be negative for payment made and positive for payment received.
 #[derive(Copy, Clone)]
-pub struct Payment {
+pub struct Payment<T: PaymentDate> {
     pub amount: f64,
-    pub date: NaiveDate,
+    pub date: T,
 }
 
 /// Calculates the internal rate of return of a series of irregular payments.
@@ -58,11 +61,11 @@ pub struct Payment {
 ///
 /// This function will return [`InvalidPaymentsError`](struct.InvalidPaymentsError.html)
 /// if both positive and negative payments are not provided.
-pub fn compute(payments: &Vec<Payment>) -> Result<f64, InvalidPaymentsError> {
+pub fn compute<T: PaymentDate>(payments: &Vec<Payment<T>>) -> Result<f64, InvalidPaymentsError> {
     validate(payments)?;
 
     let mut sorted: Vec<_> = payments.iter().collect();
-    sorted.sort_by_key(|p| p.date);
+    sorted.sort_by_key(|p| &p.date);
 
     let mut rate = compute_with_guess(&sorted, 0.1);
     let mut guess = -0.99;
@@ -88,7 +91,7 @@ impl Display for InvalidPaymentsError {
 
 impl Error for InvalidPaymentsError {}
 
-fn compute_with_guess(payments: &Vec<&Payment>, guess: f64) -> f64 {
+fn compute_with_guess<T: PaymentDate>(payments: &Vec<&Payment<T>>, guess: f64) -> f64 {
     let mut r = guess;
     let mut e = 1.0;
 
@@ -105,7 +108,7 @@ fn compute_with_guess(payments: &Vec<&Payment>, guess: f64) -> f64 {
     f64::NAN
 }
 
-fn xirr(payments: &Vec<&Payment>, rate: f64) -> f64 {
+fn xirr<T: PaymentDate>(payments: &Vec<&Payment<T>>, rate: f64) -> f64 {
     let mut result = 0.0;
     for p in payments {
         let exp = get_exp(p, payments[0]);
@@ -114,7 +117,7 @@ fn xirr(payments: &Vec<&Payment>, rate: f64) -> f64 {
     result
 }
 
-fn dxirr(payments: &Vec<&Payment>, rate: f64) -> f64 {
+fn dxirr<T: PaymentDate>(payments: &Vec<&Payment<T>>, rate: f64) -> f64 {
     let mut result = 0.0;
     for p in payments {
         let exp = get_exp(p, payments[0]);
@@ -123,7 +126,7 @@ fn dxirr(payments: &Vec<&Payment>, rate: f64) -> f64 {
     result
 }
 
-fn validate(payments: &Vec<Payment>) -> Result<(), InvalidPaymentsError> {
+fn validate<T: PaymentDate>(payments: &Vec<Payment<T>>) -> Result<(), InvalidPaymentsError> {
     let positive = payments.iter().any(|p| p.amount > 0.0);
     let negative = payments.iter().any(|p| p.amount < 0.0);
 
@@ -134,6 +137,10 @@ fn validate(payments: &Vec<Payment>) -> Result<(), InvalidPaymentsError> {
     }
 }
 
-fn get_exp(p: &Payment, p0: &Payment) -> f64 {
-    (p.date - p0.date).num_days() as f64 / 365.0
+fn get_exp<T: PaymentDate>(p: &Payment<T>, p0: &Payment<T>) -> f64 {
+    p.date.days_since(p0.date) as f64 / 365.0
+}
+
+pub trait PaymentDate: Ord + Sized + Copy {
+    fn days_since(self, other: Self) -> i32;
 }
